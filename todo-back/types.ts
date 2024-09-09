@@ -8,6 +8,8 @@ export interface TaskI {
   status: string;
 }
 
+export type UpdTask = Omit<TaskI, "user">
+
 
 export interface UserFields {
   username: string;

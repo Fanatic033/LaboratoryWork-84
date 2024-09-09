@@ -1,7 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import {auth, type RequestWithUser} from '../middleware/auth';
-import {TaskI} from '../types';
+import {TaskI, UpdTask} from '../types';
 import Task from '../models/Tasks';
 
 export const tasksRouter = express.Router();
@@ -66,3 +66,36 @@ tasksRouter.delete('/:id', auth, async (req: RequestWithUser, res, next) => {
     next(e)
   }
 })
+
+tasksRouter.put('/:id', auth, async (req: RequestWithUser, res, next) => {
+  try {
+    const {id} = req.params;
+
+    const task = await Task.findById(id);
+
+    if (!task) {
+      return res.status(404).send({error: 'Task not found'});
+    }
+
+
+    if (!task.user.equals(req.user!._id)) {
+      return res.status(403).send({error: 'Not authorized to put this task'});
+    }
+
+    const updated: UpdTask = {
+      title: req.body.title,
+      description: req.body.description,
+      status: req.body.status,
+    };
+
+    const updatedTask = await Task.findByIdAndUpdate(id, updated, {new: true, runValidators: true});
+
+    if (!updatedTask) {
+      return res.status(404).send({error: 'Task not found or failed to update'});
+    }
+
+    return res.send(updatedTask);
+  } catch (error) {
+    next(error);
+  }
+});
