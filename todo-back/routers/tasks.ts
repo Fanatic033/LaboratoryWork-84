@@ -45,27 +45,7 @@ tasksRouter.get('/', auth, async (req: RequestWithUser, res, next) => {
   }
 });
 
-tasksRouter.delete('/:id', auth, async (req: RequestWithUser, res, next) => {
-  try {
 
-    const {id} = req.params;
-
-    const task = await Task.findById(id)
-
-    if (!task) {
-      return res.status(404).send({error: 'Task not found'});
-    }
-    if (!task.user.equals(req.user!._id)) {
-      return res.status(403).send({error: 'Not authorized to delete this task'});
-    }
-
-    await Task.deleteOne({_id: id});
-
-    return res.send(`deleted Task: ${task}`);
-  } catch (e) {
-    next(e)
-  }
-})
 
 tasksRouter.put('/:id', auth, async (req: RequestWithUser, res, next) => {
   try {
@@ -99,3 +79,25 @@ tasksRouter.put('/:id', auth, async (req: RequestWithUser, res, next) => {
     next(error);
   }
 });
+
+tasksRouter.delete('/:id', auth, async (req: RequestWithUser, res, next) => {
+  try {
+
+    const {id} = req.params;
+
+    const task = await Task.findById(id)
+
+    if (!task) {
+      return res.status(404).send({error: 'Task not found'});
+    }
+    if (!task.user.equals(req.user!._id)) {
+      return res.status(403).send({error: 'Not authorized to delete this task'});
+    }
+
+    await Task.deleteOne({_id: id});
+
+    return res.send(`deleted Task: ${task}`);
+  } catch (e) {
+    next(e)
+  }
+})

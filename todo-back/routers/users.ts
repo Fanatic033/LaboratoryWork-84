@@ -1,7 +1,6 @@
 import express from 'express';
 import User from '../models/User';
 import mongoose from 'mongoose';
-import {auth, RequestWithUser} from '../middleware/auth';
 
 const usersRouter = express.Router();
 
@@ -47,20 +46,6 @@ usersRouter.post('/sessions', async (req, res, next) => {
     return next(error);
   }
 });
-
-usersRouter.post('/secret', auth, async (req: RequestWithUser, res, next) => {
-  try {
-    if (!req.user) {
-      return res.status(401).send({error: 'User not found'});
-    }
-
-
-    return res.send({username: req.user.username});
-  } catch (error) {
-    return next(error);
-  }
-});
-
 
 
 
